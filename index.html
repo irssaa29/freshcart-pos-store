@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FreshCart | Online Grocery Store</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+
+<header class="navbar">
+    <div class="logo">
+        <span class="logo-icon">🛒</span>
+        <span>FreshCart</span>
+    </div>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#categories">Categories</a>
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+    </nav>
+
+    <div class="nav-actions">
+        <button class="cart-btn" onclick="openCart()">
+            🛒 Cart
+            <span id="cartCount">0</span>
+        </button>
+
+        <button class="login-btn" onclick="openLogin()">
+            Login
+        </button>
+    </div>
+</header>
+
+
+<!-- ==================== HERO ==================== -->
+
+<section id="home" class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-text">
+
+            <span class="small-label">
+                🥬 FRESH & QUALITY GROCERIES
+            </span>
+
+            <h1>
+                Groceries delivered
+                <span>to your doorstep.</span>
+            </h1>
+
+            <p>
+                Shop fresh groceries, everyday essentials and your
+                favourite products from the comfort of your home.
+            </p>
+
+            <div class="hero-buttons">
+                <button onclick="scrollToProducts()" class="primary-btn">
+                    Shop Now →
+                </button>
+
+                <button onclick="scrollToCategories()" class="secondary-btn">
+                    Browse Categories
+                </button>
+            </div>
+
+        </div>
+
+        <div class="hero-image">
+            <div class="shopping-card">
+                <div class="basket">🛒</div>
+                <div class="floating-item item-1">🥛</div>
+                <div class="floating-item item-2">🍎</div>
+                <div class="floating-item item-3">🥖</div>
+                <div class="floating-item item-4">🥤</div>
+
+                <h3>Fresh groceries</h3>
+                <p>Delivered with care</p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================== FEATURES ==================== -->
+
+<section class="features">
+
+    <div class="feature">
+        <div class="feature-icon">🚚</div>
+        <div>
+            <h3>Fast Delivery</h3>
+            <p>Get your groceries delivered to your door.</p>
+        </div>
+    </div>
+
+    <div class="feature">
+        <div class="feature-icon">🥬</div>
+        <div>
+            <h3>Fresh Products</h3>
+            <p>Quality products for your everyday needs.</p>
+        </div>
+    </div>
+
+    <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div>
+            <h3>Secure Shopping</h3>
+            <p>Simple and secure online ordering.</p>
+        </div>
+    </div>
+
+    <div class="feature">
+        <div class="feature-icon">🏪</div>
+        <div>
+            <h3>Local Store</h3>
+            <p>Online and physical store inventory combined.</p>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- ==================== CATEGORIES ==================== -->
+
+<section id="categories" class="section">
+
+    <div class="section-heading">
+        <div>
+            <span class="section-label">SHOP BY CATEGORY</span>
+            <h2>What are you looking for?</h2>
+        </div>
+
+        <button class="text-btn" onclick="scrollToProducts()">
+            View all products →
+        </button>
+    </div>
+
+    <div id="categoriesContainer" class="categories-grid">
+        <div class="loading">Loading categories...</div>
+    </div>
+
+</section>
+
+
+<!-- ==================== PRODUCTS ==================== -->
+
+<section id="products" class="section products-section">
+
+    <div class="section-heading">
+
+        <div>
+            <span class="section-label">OUR PRODUCTS</span>
+            <h2>Fresh picks for you</h2>
+        </div>
+
+        <div class="search-box">
+            <span>🔍</span>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search groceries..."
+                oninput="searchProducts()"
+            >
+        </div>
+
+    </div>
+
+
+    <div class="filter-row">
+
+        <button
+            class="filter-btn active"
+            onclick="filterCategory(null, this)">
+            All
+        </button>
+
+        <div id="categoryFilters"></div>
+
+    </div>
+
+
+    <div id="productsContainer" class="products-grid">
+        <div class="loading">Loading products...</div>
+    </div>
+
+</section>
+
+
+<!-- ==================== ABOUT ==================== -->
+
+<section id="about" class="about-section">
+
+    <div class="about-content">
+
+        <span class="section-label">ABOUT FRESHCART</span>
+
+        <h2>
+            Your groceries,
+            <span>one click away.</span>
+        </h2>
+
+        <p>
+            FreshCart is an online grocery store connected to a centralized
+            inventory system. Customers can browse products and place orders
+            online while the same inventory is shared with the physical store.
+        </p>
+
+        <div class="about-stats">
+
+            <div>
+                <strong>8+</strong>
+                <span>Products</span>
+            </div>
+
+            <div>
+                <strong>5</strong>
+                <span>Categories</span>
+            </div>
+
+            <div>
+                <strong>24/7</strong>
+                <span>Online Shopping</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================== FOOTER ==================== -->
+
+<footer>
+
+    <div class="footer-logo">
+        🛒 FreshCart
+    </div>
+
+    <p>
+        Fresh groceries. Easy shopping. Better living.
+    </p>
+
+    <p class="copyright">
+        © 2026 FreshCart. All rights reserved.
+    </p>
+
+</footer>
+
+
+<!-- ==================== LOGIN MODAL ==================== -->
+
+<div id="loginModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeLogin()">×</button>
+
+        <div class="modal-icon">👤</div>
+
+        <h2>Welcome back</h2>
+
+        <p class="modal-subtitle">
+            Login to your FreshCart account
+        </p>
+
+        <form onsubmit="loginUser(event)">
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit" class="primary-btn full-btn">
+                Login
+            </button>
+
+        </form>
+
+        <p class="switch-text">
+            Don't have an account?
+            <button onclick="openRegister()" class="link-btn">
+                Register
+            </button>
+        </p>
+
+        <div id="loginMessage" class="form-message"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================== REGISTER MODAL ==================== -->
+
+<div id="registerModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeRegister()">×</button>
+
+        <div class="modal-icon">🛒</div>
+
+        <h2>Create account</h2>
+
+        <p class="modal-subtitle">
+            Join FreshCart today
+        </p>
+
+        <form onsubmit="registerUser(event)">
+
+            <label>Full Name</label>
+
+            <input
+                type="text"
+                id="registerName"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                id="registerEmail"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label>Phone</label>
+
+            <input
+                type="text"
+                id="registerPhone"
+                placeholder="03XXXXXXXXX"
+            >
+
+            <label>Address</label>
+
+            <input
+                type="text"
+                id="registerAddress"
+                placeholder="Enter your address"
+            >
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                id="registerPassword"
+                placeholder="Create a password"
+                required
+            >
+
+            <button type="submit" class="primary-btn full-btn">
+                Create Account
+            </button>
+
+        </form>
+
+        <p class="switch-text">
+            Already have an account?
+            <button onclick="openLoginFromRegister()" class="link-btn">
+                Login
+            </button>
+        </p>
+
+        <div id="registerMessage" class="form-message"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================== CART MODAL ==================== -->
+
+<div id="cartModal" class="modal">
+
+    <div class="modal-content cart-modal">
+
+        <button class="close-btn" onclick="closeCart()">×</button>
+
+        <h2>🛒 Your Cart</h2>
+
+        <div id="cartItems"></div>
+
+        <div class="cart-total">
+            <span>Total</span>
+            <strong id="cartTotal">Rs. 0.00</strong>
+        </div>
+
+        <button
+            class="primary-btn full-btn"
+            onclick="goToCheckout()">
+            Proceed to Checkout
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ==================== CHECKOUT MODAL ==================== -->
+
+<div id="checkoutModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeCheckout()">×</button>
+
+        <h2>Checkout</h2>
+
+        <p class="modal-subtitle">
+            Complete your order
+        </p>
+
+        <form onsubmit="placeOrder(event)">
+
+            <label>Delivery Address</label>
+
+            <textarea
+                id="checkoutAddress"
+                rows="3"
+                placeholder="Enter your complete delivery address"
+                required
+            ></textarea>
+
+            <label>Payment Method</label>
+
+            <select id="paymentMethod">
+
+                <option value="Cash on Delivery">
+                    Cash on Delivery
+                </option>
+
+                <option value="Card">
+                    Card
+                </option>
+
+                <option value="Online Wallet">
+                    Online Wallet
+                </option>
+
+            </select>
+
+            <div class="checkout-summary">
+
+                <span>Order Total</span>
+
+                <strong id="checkoutTotal">
+                    Rs. 0.00
+                </strong>
+
+            </div>
+
+            <button type="submit" class="primary-btn full-btn">
+                Place Order
+            </button>
+
+        </form>
+
+        <div id="checkoutMessage" class="form-message"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================== ORDER SUCCESS ==================== -->
+
+<div id="successModal" class="modal">
+
+    <div class="modal-content success-content">
+
+        <div class="success-icon">✓</div>
+
+        <h2>Order Placed!</h2>
+
+        <p id="successMessage">
+            Your order has been placed successfully.
+        </p>
+
+        <button
+            class="primary-btn full-btn"
+            onclick="closeSuccess()">
+            Continue Shopping
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

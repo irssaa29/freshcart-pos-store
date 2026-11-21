@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshCart | Admin Dashboard & POS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <!-- Top Navigation -->
+    <header class="bg-gray-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">⚡ FreshCart Admin & POS</h1>
+            <div class="flex items-center gap-3">
+                <a href="/" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                    View Online Store ↗
+                </a>
+                <a href="/admin/logout" class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition shadow-sm">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- Stats Overview Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Customers</p>
+                <p id="stat-customers" class="text-3xl font-bold text-gray-800 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Products</p>
+                <p id="stat-products" class="text-3xl font-bold text-gray-800 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                <p id="stat-orders" class="text-3xl font-bold text-gray-800 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                <p id="stat-sales" class="text-3xl font-bold text-emerald-600 mt-2">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Two Column Layout: POS Counter & Live Inventory Monitor -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Physical POS Counter -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🏪 Physical POS Register</h2>
+                    <p class="text-sm text-gray-500 mb-4">In-store walk-in multi-item cart. Deducts directly from central inventory.</p>
+                    
+                    <!-- Add Item Controls -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Select Product</label>
+                            <select id="pos-product-select" class="w-full border px-3 py-2 rounded-lg text-sm bg-white">
+                                <!-- Products loaded dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="pos-quantity" value="1" min="1" class="w-full border px-3 py-2 rounded-lg text-sm">
+                                <button onclick="addPOSItem()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POS Cart Items Table -->
+                    <div class="border rounded-lg overflow-hidden mb-4 max-h-40 overflow-y-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="p-2 font-semibold text-gray-600">Product</th>
+                                    <th class="p-2 font-semibold text-gray-600">Qty</th>
+                                    <th class="p-2 font-semibold text-gray-600">Price</th>
+                                    <th class="p-2 font-semibold text-gray-600">Subtotal</th>
+                                    <th class="p-2 font-semibold text-gray-600">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pos-cart-body">
+                                <tr id="pos-empty-row">
+                                    <td colspan="5" class="p-4 text-center text-gray-400">Cart is empty. Add products above.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                        <select id="pos-payment-method" class="w-full border px-3 py-2 rounded-lg text-sm bg-white">
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="Online Wallet">Online Wallet</option>
+                        </select>
+                    </div>
+
+                    <!-- Checkout Button & Total -->
+                    <div class="pt-4 border-t flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-500 block">Total Amount:</span>
+                            <span id="pos-cart-total" class="text-xl font-bold text-gray-800">PKR 0.00</span>
+                        </div>
+                        <button onclick="submitPOSSale()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition shadow-md text-sm">
+                            Complete POS Sale
+                        </button>
+                    </div>
+
+                    <!-- Restock Inventory Card -->
+                    <div class="mt-6 pt-4 border-t">
+                        <h3 class="text-lg font-bold mb-1">📦 Restock Inventory / Add New Product</h3>
+                        <p class="text-sm text-gray-500 mb-3">Add a new batch to existing stock or register a new product.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select Product</label>
+                                <select id="restock-product-select" onchange="toggleNewProductFields()" class="mt-1 block w-full rounded-md border p-2 text-sm bg-white">
+                                    <!-- Populated dynamically + New Product option -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Batch Expiry Date</label>
+                                <input type="date" id="restock-expiry-date" class="mt-1 block w-full rounded-md border p-2 text-sm" required>
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields shown ONLY when "+ Add Brand New Product..." is selected -->
+                        <div id="new-product-fields" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 p-3 bg-gray-50 rounded-md border">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">New Product Name</label>
+                                <input type="text" id="new-product-name" placeholder="e.g. Cheddar Cheese 200g" class="mt-1 block w-full rounded-md border p-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Category</label>
+                                <input type="text" id="new-product-category" placeholder="e.g. Dairy" class="mt-1 block w-full rounded-md border p-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Unit Price (PKR)</label>
+                                <input type="number" step="0.01" id="new-product-price" placeholder="450.00" class="mt-1 block w-full rounded-md border p-2 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="flex items-end gap-3">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700">Quantity to Add</label>
+                                <input type="number" id="restock-quantity" value="20" min="1" class="mt-1 block w-full rounded-md border p-2 text-sm">
+                            </div>
+                            <button onclick="submitRestock()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2 rounded-md text-sm transition">
+                                Update Stock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Inventory Monitor -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📦 Central Inventory Monitor</h2>
+                <div class="overflow-y-auto max-h-[600px] flex-1">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b text-left text-gray-600">
+                                <th class="p-2">Product</th>
+                                <th class="p-2">Available Stock</th>
+                                <th class="p-2">Expiry Date</th>
+                                <th class="p-2">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <!-- Inventory rows load dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <!-- Online Orders & Delivery Status Monitor -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b pb-3">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800">🚚 Online Orders & Delivery Monitor</h2>
+                    <p class="text-xs text-gray-500">Track customer deliveries, addresses, and update order dispatch status.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-lg">
+                    <span class="text-xs font-semibold text-amber-800">Pending Deliveries:</span>
+                    <span id="pending-deliveries-badge" class="text-lg font-bold text-amber-700">0</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase">
+                        <tr>
+                            <th class="p-3">Order ID</th>
+                            <th class="p-3">Customer & Phone</th>
+                            <th class="p-3">Delivery Address</th>
+                            <th class="p-3">Amount & Payment</th>
+                            <th class="p-3">Expected Date</th>
+                            <th class="p-3">Delivery Status</th>
+                            <th class="p-3">Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="online-orders-table-body">
+                        <tr>
+                            <td colspan="7" class="p-4 text-center text-gray-400">Loading online orders...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Controller -->
+    <script>
+        let availableProducts = [];
+        let posCart = []; // Multi-item cart array
+
+       window.onload = () => {
+            loadAdminStats();
+            loadInventoryAndPOSProducts();
+            loadOnlineOrders();
+        };
+
+        async function loadAdminStats() {
+            try {
+                const res = await fetch('/api/admin/stats');
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('stat-customers').innerText = result.data.total_customers;
+                    document.getElementById('stat-products').innerText = result.data.total_products;
+                    document.getElementById('stat-orders').innerText = result.data.total_orders;
+                    document.getElementById('stat-sales').innerText = `PKR ${result.data.total_sales.toLocaleString()}`;
+                }
+            } catch (err) {
+                console.error("Error loading stats:", err);
+            }
+        }
+
+        async function loadInventoryAndPOSProducts() {
+            try {
+                const res = await fetch('/api/products');
+                const result = await res.json();
+                if (result.success) {
+                    availableProducts = result.data;
+                    
+                    // Populate POS Dropdown
+                    const select = document.getElementById('pos-product-select');
+                    if (select) select.innerHTML = '';
+                    
+                    // Populate Inventory Table
+                    const tbody = document.getElementById('inventory-table-body');
+                    if (tbody) tbody.innerHTML = '';
+
+                    availableProducts.forEach(p => {
+                        // 1. POS Dropdown: Only show batches with stock > 0, labeled with expiry date
+                        if (select && p.quantity_available > 0) {
+                            const expLabel = p.expiry_date ? `Exp: ${p.expiry_date}` : 'No Expiry';
+                            select.innerHTML += `
+                                <option value="${p.inventory_id}" 
+                                        data-product-id="${p.product_id}"
+                                        data-name="${p.product_name} (${expLabel})" 
+                                        data-price="${p.price}">
+                                    ${p.product_name} — ${expLabel} (Stock: ${p.quantity_available}) - PKR ${p.price}
+                                </option>`;
+                        }
+
+                        // 2. Central Inventory Monitor: Show all batches with red warnings
+                        if (tbody) {
+                            const today = new Date();
+                            const expiryDate = p.expiry_date ? new Date(p.expiry_date) : null;
+                            const diffDays = expiryDate ? Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24)) : 999;
+
+                            const isLowStock = p.quantity_available < 10;
+                            const isExpiringSoon = diffDays <= 7; // Includes both expiring within 7 days AND already expired
+
+                            const stockStyle = isLowStock ? 'text-red-600 font-bold bg-red-50' : 'text-gray-700';
+                            const expiryStyle = isExpiringSoon ? 'text-red-600 font-bold bg-red-50' : 'text-gray-700';
+
+                            tbody.innerHTML += `
+                                <tr class="border-b">
+                                    <td class="p-2 font-medium">${p.product_name}</td>
+                                    <td class="p-2 ${stockStyle}">${p.quantity_available} ${isLowStock ? '⚠️' : ''}</td>
+                                    <td class="p-2 ${expiryStyle}">${p.expiry_date || 'N/A'} ${isExpiringSoon ? '⚠️' : ''}</td>
+                                    <td class="p-2">PKR ${p.price}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+
+                    populateRestockDropdown();
+                }
+            } catch (err) {
+                console.error("Error loading inventory:", err);
+            }
+        }
+
+        // Populate Restock Dropdown as well
+        function populateRestockDropdown() {
+            const restockSelect = document.getElementById('restock-product-select');
+            if (!restockSelect) return;
+
+            restockSelect.innerHTML = '';
+            const seenProducts = new Set();
+
+            availableProducts.forEach(p => {
+                if (!seenProducts.has(p.product_id)) {
+                    seenProducts.add(p.product_id);
+                    restockSelect.innerHTML += `<option value="${p.product_id}">${p.product_name}</option>`;
+                }
+            });
+
+            // Add option to create a brand-new product
+            restockSelect.innerHTML += `<option value="NEW">+ Add Brand New Product...</option>`;
+            toggleNewProductFields();
+        }
+
+        function toggleNewProductFields() {
+            const val = document.getElementById('restock-product-select').value;
+            const newFields = document.getElementById('new-product-fields');
+            if (!newFields) return;
+
+            if (val === 'NEW') {
+                newFields.classList.remove('hidden');
+            } else {
+                newFields.classList.add('hidden');
+            }
+        }
+
+        async function submitRestock() {
+            const productSelectVal = document.getElementById('restock-product-select').value;
+            const quantity = parseInt(document.getElementById('restock-quantity').value);
+            const expiryDate = document.getElementById('restock-expiry-date').value;
+
+            if (!quantity || quantity <= 0 || !expiryDate) {
+                alert("Please enter a valid quantity and expiry date.");
+                return;
+            }
+
+            const payload = {
+                is_new_product: productSelectVal === 'NEW',
+                product_id: productSelectVal === 'NEW' ? null : parseInt(productSelectVal),
+                product_name: document.getElementById('new-product-name').value.trim(),
+                category: document.getElementById('new-product-category').value.trim(),
+                price: parseFloat(document.getElementById('new-product-price').value),
+                quantity: quantity,
+                expiry_date: expiryDate
+            };
+
+            try {
+                const res = await fetch('/api/admin/restock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    loadAdminStats();
+                    loadInventoryAndPOSProducts(); // Refresh table & dropdowns live
+                }
+            } catch (err) {
+                console.error("Restock error:", err);
+                alert("An error occurred while updating inventory.");
+            }
+        }
+
+        // Add item to local POS cart
+        function addPOSItem() {
+            const select = document.getElementById('pos-product-select');
+            const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption) return;
+
+            const inventoryId = parseInt(select.value);
+            const productId = parseInt(selectedOption.getAttribute('data-product-id'));
+            const productName = selectedOption.getAttribute('data-name');
+            const price = parseFloat(selectedOption.getAttribute('data-price'));
+            const quantity = parseInt(document.getElementById('pos-quantity').value);
+
+            if (!quantity || quantity <= 0) {
+                alert("Please enter a valid quantity.");
+                return;
+            }
+
+            // Check if this exact expiry batch is already in the cart
+            const existingIndex = posCart.findIndex(item => item.inventory_id === inventoryId);
+            if (existingIndex > -1) {
+                posCart[existingIndex].quantity += quantity;
+            } else {
+                posCart.push({
+                    inventory_id: inventoryId,
+                    product_id: productId,
+                    product_name: productName,
+                    price: price,
+                    quantity: quantity
+                });
+            }
+            renderPOSCart();
+        }
+
+        // Remove item from local POS cart
+        function removePOSItem(index) {
+            posCart.splice(index, 1);
+            renderPOSCart();
+        }
+
+        // Render POS cart table & calculate total
+        function renderPOSCart() {
+            const tbody = document.getElementById('pos-cart-body');
+            const totalElement = document.getElementById('pos-cart-total');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (posCart.length === 0) {
+                tbody.innerHTML = `<tr id="pos-empty-row"><td colspan="5" class="p-4 text-center text-gray-400">Cart is empty. Add products above.</td></tr>`;
+                if (totalElement) totalElement.innerText = "PKR 0.00";
+                return;
+            }
+
+            let grandTotal = 0;
+            posCart.forEach((item, index) => {
+                const subtotal = item.price * item.quantity;
+                grandTotal += subtotal;
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-2">${item.product_name}</td>
+                        <td class="p-2">${item.quantity}</td>
+                        <td class="p-2">PKR ${item.price}</td>
+                        <td class="p-2 font-semibold">PKR ${subtotal}</td>
+                        <td class="p-2"><button onclick="removePOSItem(${index})" class="text-red-500 hover:text-red-700 font-bold">✕</button></td>
+                    </tr>
+                `;
+            });
+
+            if (totalElement) totalElement.innerText = `PKR ${grandTotal.toLocaleString()}`;
+        }
+
+        // Submit complete multi-item cart to backend
+        async function submitPOSSale() {
+            if (posCart.length === 0) {
+                alert("Your POS cart is empty. Add items before checking out.");
+                return;
+            }
+
+            const paymentMethod = document.getElementById('pos-payment-method').value;
+            const payload = {
+                payment_method: paymentMethod,
+                items: posCart.map(i => ({
+                    inventory_id: i.inventory_id,
+                    product_id: i.product_id,
+                    quantity: i.quantity
+                }))
+            };
+
+            try {
+                const res = await fetch('/api/pos/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert(`✅ POS Multi-item sale completed successfully! Order ID: ${result.order_id}`);
+                    posCart = []; // Clear cart
+                    renderPOSCart();
+                    loadAdminStats();
+                    loadInventoryAndPOSProducts(); // Refresh inventory counts
+                } else {
+                    alert(`POS Checkout failed: ${result.message}`);
+                }
+            } catch (err) {
+                console.error("POS error:", err);
+                alert("An error occurred during POS checkout.");
+            }
+        }
+        async function loadOnlineOrders() {
+            try {
+                const res = await fetch('/api/admin/online-orders');
+                const result = await res.json();
+                if (!result.success) return;
+
+                // Update pending deliveries counter badge
+                const badge = document.getElementById('pending-deliveries-badge');
+                if (badge) badge.innerText = result.pending_count;
+
+                const tbody = document.getElementById('online-orders-table-body');
+                if (!tbody) return;
+
+                if (result.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">No online orders placed yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                result.data.forEach(order => {
+                    const status = order.effective_status;
+                    let badgeClass = 'bg-gray-100 text-gray-700';
+                    if (status === 'Pending') badgeClass = 'bg-amber-100 text-amber-800 font-bold';
+                    else if (status === 'Out for Delivery') badgeClass = 'bg-blue-100 text-blue-800 font-bold';
+                    else if (status === 'Delivered') badgeClass = 'bg-emerald-100 text-emerald-800 font-bold';
+                    else if (status === 'Cancelled') badgeClass = 'bg-red-100 text-red-800 font-bold';
+
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-3 font-semibold">#${order.order_id}<br><span class="text-xs text-gray-400">${order.order_date}</span></td>
+                            <td class="p-3">
+                                <div class="font-medium text-gray-800">${order.customer_name}</div>
+                                <div class="text-xs text-gray-500">${order.customer_phone || 'No phone'}</div>
+                            </td>
+                            <td class="p-3 text-xs text-gray-700 max-w-xs">${order.delivery_address || 'N/A'}</td>
+                            <td class="p-3">
+                                <div class="font-semibold">PKR ${order.total_amount.toLocaleString()}</div>
+                                <div class="text-xs text-gray-500">${order.payment_method || 'COD'} (${order.payment_status || 'Pending'})</div>
+                            </td>
+                            <td class="p-3 text-xs text-gray-700">${order.expected_date || 'N/A'}</td>
+                            <td class="p-3">
+                                <span class="px-2.5 py-1 rounded-full text-xs ${badgeClass}">${status}</span>
+                            </td>
+                            <td class="p-3">
+                                <select onchange="changeDeliveryStatus(${order.order_id}, this.value)" class="border rounded-md px-2 py-1 text-xs bg-white">
+                                    <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Out for Delivery" ${status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                                    <option value="Delivered" ${status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                    <option value="Cancelled" ${status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Error loading online orders:", err);
+            }
+        }
+
+        async function changeDeliveryStatus(orderId, newStatus) {
+            try {
+                const res = await fetch(`/api/admin/orders/${orderId}/delivery-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ delivery_status: newStatus })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    loadOnlineOrders();
+                    loadAdminStats();
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                console.error("Error updating delivery status:", err);
+                alert("Failed to update delivery status.");
+            }
+        }
+    </script>
+</body>
+</html>
